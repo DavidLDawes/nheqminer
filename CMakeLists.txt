@@ -9,7 +9,7 @@ option(USE_CPU_TROMP "USE CPU_TROMP" OFF)
 option(USE_CUDA_TROMP "USE CUDA_TROMP" OFF)
 #### faster
 option(USE_CPU_XENONCAT "USE CPU_XENONCAT" ON)
-option(USE_CUDA_DJEZO "USE CUDA_DJEZO" ON)
+option(USE_CUDA_DJEZO "USE CUDA_DJEZO" OFF)
 option(USE_CPU_VERUSHASH "USE CPU_VERUSHASH" ON)
 
 ## Add solvers here
@@ -39,19 +39,31 @@ endif()
 # LINUX
 if(CMAKE_COMPILER_IS_GNUCXX)
     # use native cpu features
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -fPIC")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -fPIC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64 -mpclmul -msse4 -msse4.1 -msse4.2 -mssse3 -mavx -maes -g -fomit-frame-pointer -fPIC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -mpclmul -msse4 -msse4.1 -msse4.2 -mssse3 -mavx -maes -g -fomit-frame-pointer -fPIC")
 
     # optimizations
-    add_definitions(-O2)
+    add_definitions(-Ofast)
 
 #    # use
 #    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64 -msse2")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -msse2")
 #    # optimizations
-#    add_definitions(-O2)
+#    add_definitions(-O3)
+
 endif()
 
+# MACOS
+if(APPLE)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+        # use native cpu features
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64 -mpclmul -msse4 -msse4.1 -msse4.2 -mssse3 -mavx -maes -fPIC")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -fPIC")
+        include_directories(${nheqminer_SOURCE_DIR}/nheqminer/compat)
+        # optimizations
+        add_definitions(-Ofast)
+    endif()
+endif(APPLE)
 # Common
 include_directories(${nheqminer_SOURCE_DIR}/nheqminer)
 
@@ -94,6 +106,8 @@ set(SOURCE_FILES
     nheqminer/crypto/haraka.c
     nheqminer/crypto/haraka_portable.c
     nheqminer/crypto/verus_hash.cpp
+    nheqminer/crypto/verus_clhash.cpp
+    nheqminer/crypto/verus_clhash_portable.cpp
     nheqminer/json/json_spirit_reader.cpp
     nheqminer/json/json_spirit_value.cpp
     nheqminer/json/json_spirit_writer.cpp
@@ -108,10 +122,12 @@ set(SOURCE_FILES
     nheqminer/amount.h
     nheqminer/api.hpp
     nheqminer/arith_uint256.h
-    nheqminer/crypto/sha256.h
+    nheqminer/crypto/verus_clhash.h
     nheqminer/crypto/haraka.h
     nheqminer/crypto/haraka_portable.h
+    nheqminer/crypto/sha256.h
     nheqminer/crypto/verus_hash.h
+    nheqminer/crypto/verus_clhash.h
     nheqminer/hash.h
     nheqminer/json/json_spirit.h
     nheqminer/json/json_spirit_error_position.h

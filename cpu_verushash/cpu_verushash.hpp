@@ -21,12 +21,27 @@ struct cpu_verushash
 		std::function<void(void)> hashdonef,
 		cpu_verushash &device_context);
 
+	static void solve_verus_v2(CBlockHeader &bh, 
+		arith_uint256 &target,
+		std::function<bool()> cancelf,
+		std::function<void(const std::vector<uint32_t>&, size_t, const unsigned char*)> solutionf,
+		std::function<void(void)> hashdonef,
+		cpu_verushash &device_context);
+
+	static void solve_verus_v2_opt(CBlockHeader &bh, 
+		arith_uint256 &target,
+		std::function<bool()> cancelf,
+		std::function<void(const std::vector<uint32_t>&, size_t, const unsigned char*)> solutionf,
+		std::function<void(void)> hashdonef,
+		cpu_verushash &device_context);
+
 	std::string getname()
 	{ 
-		return "CPU-VERUSHASH-AES";
+		return "VerusHash 2.0 - CPU";
 	}
 
 	CVerusHashWriter *pVHW;
+	CVerusHashV2bWriter *pVHW2b;
 	int use_opt; // unused
 };
 
